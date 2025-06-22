@@ -4,17 +4,20 @@ Your Next.js project has been successfully configured for Netlify deployment. He
 
 ## Configuration Changes Made
 
-1. **next.config.ts** - Updated with static export configuration:
+1. **package.json** - Added missing Supabase dependency:
+   - Added `@supabase/supabase-js` to dependencies
+
+2. **next.config.ts** - Updated with static export configuration:
    - `output: 'export'` - Enables static site generation
    - `trailingSlash: true` - Ensures proper routing on Netlify
    - `images: { unoptimized: true }` - Disables Next.js image optimization for static export
 
-2. **netlify.toml** - Created Netlify configuration file:
+3. **netlify.toml** - Created Netlify configuration file:
    - Build command: `npm run build`
    - Publish directory: `out`
    - Redirect rules for SPA routing
 
-3. **TypeScript Fix** - Fixed the `any` type issue in `components/clients-content.tsx`
+4. **TypeScript Fix** - Fixed the `any` type issue in `components/clients-content.tsx`
 
 ## Build Output
 
