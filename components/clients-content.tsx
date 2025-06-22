@@ -14,9 +14,20 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "<YOUR_SUPABASE_URL>
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "<YOUR_SUPABASE_ANON_KEY>"
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+interface Client {
+  id: string
+  name: string
+  company: string
+  email: string
+  status: string
+  revenue: string
+  projects: number
+  last_contact: string
+}
+
 export function ClientsContent() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [clients, setClients] = useState<any[]>([])
+  const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
