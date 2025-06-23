@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,9 +9,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Search, MoreHorizontal, Plus, Filter } from "lucide-react"
 import { createClient } from "@supabase/supabase-js"
+import { AddClientForm } from "./add-client-form"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "<YOUR_SUPABASE_URL>"
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "<YOUR_SUPABASE_ANON_KEY>"
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 interface Client {
@@ -30,22 +31,24 @@ export function ClientsContent() {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isAddClientOpen, setAddClientOpen] = useState(false)
+
+  const fetchClients = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    const { data, error } = await supabase.from("clients").select("*")
+    if (error) {
+      setError(error.message)
+      setClients([])
+    } else {
+      setClients(data || [])
+    }
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
-    const fetchClients = async () => {
-      setLoading(true)
-      setError(null)
-      const { data, error } = await supabase.from("clients").select("*")
-      if (error) {
-        setError(error.message)
-        setClients([])
-      } else {
-        setClients(data || [])
-      }
-      setLoading(false)
-    }
     fetchClients()
-  }, [])
+  }, [fetchClients])
 
   const filteredClients = clients.filter(
     (client) =>
@@ -72,11 +75,16 @@ export function ClientsContent() {
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900">Clients</h2>
-        <Button className="bg-blue-600 hover:bg-blue-700">
+        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setAddClientOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
           Add Client
         </Button>
       </div>
+      <AddClientForm
+        isOpen={isAddClientOpen}
+        onClose={() => setAddClientOpen(false)}
+        onClientAdded={fetchClients}
+      />
       {loading && <div className="mb-4">Loading clients...</div>}
       {error && <div className="mb-4 text-red-600">Error: {error}</div>}
 
